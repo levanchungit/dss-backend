@@ -66,15 +66,11 @@ app.post("/api/suggest-career", (req, res) => {
     typeof userAnswers !== "object" ||
     Object.keys(userAnswers).length === 0
   ) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Dữ liệu đầu vào không hợp lệ. Vui lòng gửi một object JSON chứa các câu trả lời.",
-      });
+    return res.status(400).json({
+      error:
+        "Dữ liệu đầu vào không hợp lệ. Vui lòng gửi một object JSON chứa các câu trả lời.",
+    });
   }
-
-  console.log("Nhận được yêu cầu gợi ý với dữ liệu:", userAnswers);
 
   // Thuật toán tính điểm tương đồng đơn giản
   const suggestions = careerData.map((career) => {
