@@ -47,76 +47,131 @@ try {
 }
 
 // --- BƯỚC 4: ĐỊNH NGHĨA LOGIC GỢI Ý DỰA TRÊN MBTI ---
-
-// Ánh xạ các đặc điểm của nghề nghiệp với loại MBTI tương ứng
-const mbtiCareerMapping = {
-  // ANALYSTS - Nhà Phân Tích
-  INTJ: (job) =>
-    job.people_person === 0 &&
-    job.data_skill === 1 &&
-    job.creativity_level >= 1,
-  INTP: (job) =>
-    job.people_person === 0 &&
-    job.tech_comfort === 1 &&
-    job.creativity_level >= 2,
-  ENTJ: (job) =>
-    job.people_person === 1 &&
-    job.public_speaking === 1 &&
-    job.data_skill === 1,
-  ENTP: (job) =>
-    job.people_person === 1 &&
-    job.public_speaking === 1 &&
-    job.creativity_level >= 2,
-  // DIPLOMATS - Nhà Ngoại Giao
-  INFJ: (job) =>
-    job.people_person === 1 &&
-    job.teamwork === 1 &&
-    job.creativity_level >= 1 &&
-    job.public_speaking === 0,
-  INFP: (job) =>
-    job.people_person === 0 && job.artistic === 1 && job.creativity_level >= 2,
-  ENFJ: (job) =>
-    job.people_person === 1 && job.public_speaking === 1 && job.teamwork === 1,
-  ENFP: (job) =>
-    job.people_person === 1 && job.artistic === 1 && job.creativity_level >= 2,
-  // SENTINELS - Người Canh Gác
-  ISTJ: (job) =>
-    job.people_person === 0 &&
-    job.data_skill === 1 &&
-    job.preferred_work_env === 0,
-  ISFJ: (job) =>
-    job.people_person === 1 && job.teamwork === 0 && job.data_skill === 1,
-  ESTJ: (job) =>
-    job.people_person === 1 &&
-    job.public_speaking === 1 &&
-    job.preferred_work_env === 1 &&
-    job.teamwork === 1,
-  ESFJ: (job) =>
-    job.people_person === 1 && job.teamwork === 1 && job.creativity_level <= 1,
-  // EXPLORERS - Người Khám Phá
-  ISTP: (job) =>
-    job.people_person === 0 && job.tech_comfort === 0 && job.outdoor === 1,
-  ISFP: (job) =>
-    job.people_person === 0 && job.artistic === 1 && job.outdoor === 1,
-  ESTP: (job) =>
-    job.people_person === 1 && job.outdoor === 1 && job.public_speaking === 1,
-  ESFP: (job) =>
-    job.people_person === 1 &&
-    job.artistic === 1 &&
-    job.preferred_work_env === 1,
+// --- BƯỚC 4: ĐỊNH NGHĨA TIÊU CHÍ MBTI DẠNG CRITERIA ---
+const mbtiCriteriaMapping = {
+  INTJ: [
+    { key: "people_person", expected: 0, weight: 2 },
+    { key: "data_skill", expected: 1, weight: 3 },
+    { key: "creativity_level", expectedMin: 1, weight: 2 },
+  ],
+  INTP: [
+    { key: "people_person", expected: 0, weight: 2 },
+    { key: "tech_comfort", expected: 1, weight: 3 },
+    { key: "creativity_level", expectedMin: 2, weight: 2 },
+  ],
+  ENTJ: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "public_speaking", expected: 1, weight: 3 },
+    { key: "data_skill", expected: 1, weight: 2 },
+  ],
+  ENTP: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "public_speaking", expected: 1, weight: 3 },
+    { key: "creativity_level", expectedMin: 2, weight: 2 },
+  ],
+  INFJ: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "teamwork", expected: 1, weight: 2 },
+    { key: "creativity_level", expectedMin: 1, weight: 2 },
+    { key: "public_speaking", expected: 0, weight: 1 },
+  ],
+  INFP: [
+    { key: "people_person", expected: 0, weight: 2 },
+    { key: "artistic", expected: 1, weight: 3 },
+    { key: "creativity_level", expectedMin: 2, weight: 2 },
+  ],
+  ENFJ: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "public_speaking", expected: 1, weight: 3 },
+    { key: "teamwork", expected: 1, weight: 2 },
+  ],
+  ENFP: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "artistic", expected: 1, weight: 3 },
+    { key: "creativity_level", expectedMin: 2, weight: 2 },
+  ],
+  ISTJ: [
+    { key: "people_person", expected: 0, weight: 2 },
+    { key: "data_skill", expected: 1, weight: 3 },
+    { key: "preferred_work_env", expected: 0, weight: 2 },
+  ],
+  ISFJ: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "teamwork", expected: 0, weight: 2 },
+    { key: "data_skill", expected: 1, weight: 3 },
+  ],
+  ESTJ: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "public_speaking", expected: 1, weight: 2 },
+    { key: "preferred_work_env", expected: 1, weight: 2 },
+    { key: "teamwork", expected: 1, weight: 2 },
+  ],
+  ESFJ: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "teamwork", expected: 1, weight: 3 },
+    { key: "creativity_level", expectedMax: 1, weight: 2 },
+  ],
+  ISTP: [
+    { key: "people_person", expected: 0, weight: 2 },
+    { key: "tech_comfort", expected: 0, weight: 2 },
+    { key: "outdoor", expected: 1, weight: 3 },
+  ],
+  ISFP: [
+    { key: "people_person", expected: 0, weight: 2 },
+    { key: "artistic", expected: 1, weight: 3 },
+    { key: "outdoor", expected: 1, weight: 2 },
+  ],
+  ESTP: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "outdoor", expected: 1, weight: 2 },
+    { key: "public_speaking", expected: 1, weight: 2 },
+  ],
+  ESFP: [
+    { key: "people_person", expected: 1, weight: 2 },
+    { key: "artistic", expected: 1, weight: 3 },
+    { key: "preferred_work_env", expected: 1, weight: 2 },
+  ],
 };
 
-// --- BƯỚC 5: XÂY DỰNG API MỚI CHO MBTI ---
+// --- HÀM TÍNH MATCH SCORE ---
+function calculateMatchScore(job, criteria) {
+  let score = 0;
+  let maxScore = 0;
 
-/**
- * API Endpoint: POST /api/mbti-suggest
- * Nhận kết quả trắc nghiệm, tính toán loại MBTI và gợi ý ngành nghề.
- *
- * Request Body (Ví dụ):
- * {
- * "q1": "I", "q2": "E", ..., "q16": "J"
- * }
- */
+  // 1. Cộng điểm nếu khớp
+  for (const c of criteria) {
+    maxScore += c.weight;
+    const val = job[c.key] ?? 0;
+
+    if (c.expected !== undefined) {
+      const diff = Math.abs(val - c.expected);
+      score += (1 - diff) * c.weight;
+    }
+    if (c.expectedMin !== undefined) {
+      score += (val >= c.expectedMin ? 1 : val / c.expectedMin) * c.weight;
+    }
+    if (c.expectedMax !== undefined) {
+      score += (val <= c.expectedMax ? 1 : c.expectedMax / val) * c.weight;
+    }
+  }
+
+  // 2. Trừ điểm nếu nghề có extra key ngoài criteria
+  const criteriaKeys = criteria.map(c => c.key);
+  const allKeys = Object.keys(job).filter(
+    k => !["name", "id", "detail"].includes(k)
+  );
+  const extraKeys = allKeys.filter(k => !criteriaKeys.includes(k));
+
+  const penaltyPerExtra = maxScore * 0.05; // trừ 5% maxScore mỗi extra
+  score -= extraKeys.length * penaltyPerExtra;
+
+  if (score < 0) score = 0;
+
+  // 3. Chuẩn hóa sang %
+  return Math.round((score / maxScore) * 100);
+}
+
+// --- API MBTI SUGGEST ---
 app.post("/api/mbti-suggest", (req, res) => {
   const userAnswers = req.body;
 
@@ -130,7 +185,7 @@ app.post("/api/mbti-suggest", (req, res) => {
       .json({ error: "Dữ liệu không hợp lệ. Cần đủ 16 câu trả lời." });
   }
 
-  // 1. Tính toán loại MBTI từ câu trả lời
+  // 1. Tính MBTI type
   const counts = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
   for (const key in userAnswers) {
     const value = userAnswers[key];
@@ -145,16 +200,26 @@ app.post("/api/mbti-suggest", (req, res) => {
   mbtiType += counts.T > counts.F ? "T" : "F";
   mbtiType += counts.J > counts.P ? "P" : "J";
 
-  // 2. Lọc ra các ngành nghề phù hợp
-  const suggestionFilter = mbtiCareerMapping[mbtiType];
-  const suggestions = uniqueCareerData.filter(suggestionFilter);
+  // 2. Lấy criteria theo MBTI
+  const criteria = mbtiCriteriaMapping[mbtiType];
+  if (!criteria) {
+    return res.status(500).json({ error: "Không tìm thấy mapping cho MBTI này" });
+  }
 
-  // 3. Giới hạn số lượng gợi ý (ví dụ: tối đa 5)
-  const topSuggestions = suggestions.slice(0, 5);
+  // 3. Chấm điểm tất cả nghề
+  const scoredJobs = uniqueCareerData.map(job => ({
+    ...job,
+    matchScore: calculateMatchScore(job, criteria),
+  }));
 
-  // 4. Trả về kết quả
+  // 4. Sắp xếp giảm dần theo điểm
+  const sorted = scoredJobs.sort((a, b) => b.matchScore - a.matchScore);
+
+  // 5. Lấy top 5
+  const topSuggestions = sorted.slice(0, 5);
+
   res.status(200).json({
-    mbtiType: mbtiType,
+    mbtiType,
     suggestions: topSuggestions,
   });
 });
